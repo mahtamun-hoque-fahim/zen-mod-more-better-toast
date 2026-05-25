@@ -1,0 +1,159 @@
+/* ============================================================
+   Better Toast — Zen Browser Mod
+   by mahtamun-hoque-fahim
+   ============================================================
+   Frosted-glass pill notification with:
+   · backdrop-filter blur
+   · Auto dark/light color switching
+   · 4-way position control (top/bottom × left/right)
+   · Safe minimum offset (works even when element-separation = 0)
+   · Smooth entrance + hover accent transition
+   ============================================================ */
+
+/* ── Internal variables (tweak these if needed) ── */
+:root {
+  --mbt-blur:        12px;
+  --mbt-radius:      999px;   /* full pill */
+  --mbt-padding:     8px 16px;
+  --mbt-font-size:   12px;
+  --mbt-desc-size:   10px;
+  --mbt-font-weight: 500;
+  --mbt-max-width:   320px;
+  --mbt-min-offset:  12px;    /* fallback when element-separation = 0 */
+  --mbt-transition:  0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --mbt-letter-spacing: 0.01em;
+
+  /* Glass colours — light mode defaults */
+  --mbt-bg:          rgba(255, 255, 255, 0.18);
+  --mbt-border:      rgba(255, 255, 255, 0.30);
+  --mbt-text:        rgba(255, 255, 255, 0.95);
+  --mbt-shadow:      0 4px 24px rgba(0, 0, 0, 0.18),
+                     0 1px 4px  rgba(0, 0, 0, 0.10);
+}
+
+/* ── Dark mode: white-tinted glass ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mbt-bg:     rgba(255, 255, 255, 0.14);
+    --mbt-border: rgba(255, 255, 255, 0.22);
+    --mbt-text:   rgba(255, 255, 255, 0.95);
+    --mbt-shadow: 0 4px 24px rgba(0, 0, 0, 0.35),
+                  0 1px 4px  rgba(0, 0, 0, 0.20);
+  }
+}
+
+/* ── Light mode: dark-tinted glass ── */
+@media (prefers-color-scheme: light) {
+  :root {
+    --mbt-bg:     rgba(0, 0, 0, 0.10);
+    --mbt-border: rgba(0, 0, 0, 0.14);
+    --mbt-text:   rgba(0, 0, 0, 0.88);
+    --mbt-shadow: 0 4px 24px rgba(0, 0, 0, 0.12),
+                  0 1px 4px  rgba(0, 0, 0, 0.06);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   CONTAINER — positioning
+   ════════════════════════════════════════════════════════════ */
+#zen-toast-container {
+  /* Safe offset: max(preference-driven offset, minimum fallback) */
+  --_offset-v: max(
+    calc(var(--zen-element-separation, 8px) * 4),
+    var(--mbt-min-offset)
+  );
+  --_offset-h: max(
+    calc(var(--zen-element-separation, 8px) * 2),
+    var(--mbt-min-offset)
+  );
+
+  /* ── Default position: top ── */
+  top:    var(--_offset-v) !important;
+  bottom: unset            !important;
+
+  /* ── Default horizontal: right (sidebar on left) ── */
+  right:  var(--_offset-h) !important;
+  left:   unset            !important;
+
+  /* ── Flip horizontal when sidebar is on the right ── */
+  :root[zen-right-side='true'] & {
+    left:  var(--_offset-h) !important;
+    right: unset            !important;
+  }
+
+  /* ────────────────────────────────────────────────
+     POSITION PREFERENCES
+     Users set these via Zen Mod settings.
+     Each combo overrides top/bottom and left/right.
+  ──────────────────────────────────────────────── */
+
+  /* Position: bottom */
+  &:has(#mbt-prefs[mbt-position-v='bottom']) {
+    top:    unset            !important;
+    bottom: var(--_offset-v) !important;
+  }
+
+  /* Position: left (override sidebar-aware default) */
+  &:has(#mbt-prefs[mbt-position-h='left']) {
+    right: unset            !important;
+    left:  var(--_offset-h) !important;
+  }
+
+  /* Position: right (force right even on right-sidebar setups) */
+  &:has(#mbt-prefs[mbt-position-h='right']) {
+    left:  unset            !important;
+    right: var(--_offset-h) !important;
+  }
+
+  /* Position: center */
+  &:has(#mbt-prefs[mbt-position-h='center']) {
+    left:      50%            !important;
+    right:     unset          !important;
+    transform: translateX(-50%) !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   TOAST — frosted glass pill
+   ════════════════════════════════════════════════════════════ */
+#zen-toast-container .zen-toast {
+  /* Shape */
+  padding:       var(--mbt-padding)   !important;
+  border-radius: var(--mbt-radius)    !important;
+  max-width:     var(--mbt-max-width) !important;
+
+  /* Glass */
+  background:    var(--mbt-bg)     !important;
+  border:        1px solid var(--mbt-border) !important;
+  backdrop-filter:         blur(var(--mbt-blur)) saturate(1.6) !important;
+  -webkit-backdrop-filter: blur(var(--mbt-blur)) saturate(1.6) !important;
+  box-shadow:    var(--mbt-shadow) !important;
+
+  /* Typography */
+  color:          var(--mbt-text)           !important;
+  font-size:      var(--mbt-font-size)      !important;
+  font-weight:    var(--mbt-font-weight)    !important;
+  letter-spacing: var(--mbt-letter-spacing) !important;
+
+  /* Transition */
+  transition: background var(--mbt-transition),
+              border-color var(--mbt-transition),
+              color var(--mbt-transition),
+              box-shadow var(--mbt-transition) !important;
+
+  /* Description text */
+  & .description {
+    font-size:   var(--mbt-desc-size) !important;
+    opacity:     0.75                 !important;
+    margin-top:  2px                  !important;
+  }
+
+  /* ── Hover: accent highlight ── */
+  &:hover {
+    background:   var(--zen-primary-color) !important;
+    color:        var(--button-primary-color, #fff) !important;
+    border-color: transparent !important;
+    box-shadow:   0 4px 28px color-mix(in srgb, var(--zen-primary-color) 40%, transparent),
+                  0 1px 6px  color-mix(in srgb, var(--zen-primary-color) 25%, transparent) !important;
+  }
+}
