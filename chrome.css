@@ -68,6 +68,10 @@
     var(--mbt-min-offset)
   );
 
+  /* Sit above panels, toolbars, sidebars — so blur has real UI to blur */
+  z-index: 2147483647 !important;
+  position: fixed !important;
+
   /* Default: top */
   top:    var(--_offset-v) !important;
   bottom: unset            !important;
@@ -137,6 +141,11 @@
    TOAST — frosted glass pill
    ════════════════════════════════════════════════════════════ */
 #zen-toast-container .zen-toast {
+  /* Ensure each toast creates its own stacking context for backdrop-filter */
+  isolation: isolate;
+  position:  relative;
+  z-index:   1;
+
   /* Shape */
   padding:       var(--mbt-padding)   !important;
   border-radius: var(--mbt-radius)    !important;
