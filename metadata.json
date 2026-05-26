@@ -1,24 +1,24 @@
 {
   "name": "Better Toast",
-  "description": "Frosted-glass pill toast notifications with dark/light auto-color, backdrop blur, and full position control.",
+  "description": "Frosted-glass pill toast with blur, auto dark/light & position control.",
   "id": "mahtamun-better-toast@zen",
   "author": "mahtamun-hoque-fahim",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "tags": ["toast", "notification", "glass", "blur", "minimal"],
   "homepage": "https://github.com/mahtamun-hoque-fahim/zen-mod-more-better-toast",
   "preferences": [
     {
-      "property": "mbt-position-v",
+      "property": "mod.better-toast.position-v",
       "label": "Vertical Position",
       "type": "dropdown",
       "options": [
         { "label": "Top",    "value": "top"    },
         { "label": "Bottom", "value": "bottom" }
       ],
-      "default": "top"
+      "defaultValue": "top"
     },
     {
-      "property": "mbt-position-h",
+      "property": "mod.better-toast.position-h",
       "label": "Horizontal Position",
       "type": "dropdown",
       "options": [
@@ -27,7 +27,7 @@
         { "label": "Center",               "value": "center" },
         { "label": "Right",                "value": "right"  }
       ],
-      "default": "auto"
+      "defaultValue": "auto"
     }
   ]
 }

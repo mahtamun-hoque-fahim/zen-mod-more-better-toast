@@ -5,30 +5,30 @@
    Frosted-glass pill notification with:
    · backdrop-filter blur
    · Auto dark/light color switching
-   · 4-way position control (top/bottom × left/right)
+   · 4-way position control (top/bottom × left/right/center/auto)
    · Safe minimum offset (works even when element-separation = 0)
    · Smooth entrance + hover accent transition
    ============================================================ */
 
 /* ── Internal variables (tweak these if needed) ── */
 :root {
-  --mbt-blur:        12px;
-  --mbt-radius:      999px;   /* full pill */
-  --mbt-padding:     8px 16px;
-  --mbt-font-size:   12px;
-  --mbt-desc-size:   10px;
-  --mbt-font-weight: 500;
-  --mbt-max-width:   320px;
-  --mbt-min-offset:  12px;    /* fallback when element-separation = 0 */
-  --mbt-transition:  0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --mbt-blur:           12px;
+  --mbt-radius:         999px;   /* full pill */
+  --mbt-padding:        8px 16px;
+  --mbt-font-size:      12px;
+  --mbt-desc-size:      10px;
+  --mbt-font-weight:    500;
+  --mbt-max-width:      320px;
+  --mbt-min-offset:     12px;    /* fallback when element-separation = 0 */
+  --mbt-transition:     0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --mbt-letter-spacing: 0.01em;
 
   /* Glass colours — light mode defaults */
-  --mbt-bg:          rgba(255, 255, 255, 0.18);
-  --mbt-border:      rgba(255, 255, 255, 0.30);
-  --mbt-text:        rgba(255, 255, 255, 0.95);
-  --mbt-shadow:      0 4px 24px rgba(0, 0, 0, 0.18),
-                     0 1px 4px  rgba(0, 0, 0, 0.10);
+  --mbt-bg:     rgba(255, 255, 255, 0.18);
+  --mbt-border: rgba(255, 255, 255, 0.30);
+  --mbt-text:   rgba(255, 255, 255, 0.95);
+  --mbt-shadow: 0 4px 24px rgba(0, 0, 0, 0.18),
+                0 1px 4px  rgba(0, 0, 0, 0.10);
 }
 
 /* ── Dark mode: white-tinted glass ── */
@@ -54,7 +54,8 @@
 }
 
 /* ════════════════════════════════════════════════════════════
-   CONTAINER — positioning
+   CONTAINER — default positioning
+   Default: top + auto (sidebar-aware)
    ════════════════════════════════════════════════════════════ */
 #zen-toast-container {
   /* Safe offset: max(preference-driven offset, minimum fallback) */
@@ -67,48 +68,67 @@
     var(--mbt-min-offset)
   );
 
-  /* ── Default position: top ── */
+  /* Default: top */
   top:    var(--_offset-v) !important;
   bottom: unset            !important;
 
-  /* ── Default horizontal: right (sidebar on left) ── */
+  /* Default horizontal: right (sidebar typically on left) */
   right:  var(--_offset-h) !important;
   left:   unset            !important;
+}
 
-  /* ── Flip horizontal when sidebar is on the right ── */
-  :root[zen-right-side='true'] & {
-    left:  var(--_offset-h) !important;
-    right: unset            !important;
-  }
+/* Sidebar-aware: flip to left when sidebar is on the right */
+:root[zen-right-side='true'] #zen-toast-container {
+  left:  var(--_offset-h) !important;
+  right: unset            !important;
+}
 
-  /* ────────────────────────────────────────────────
-     POSITION PREFERENCES
-     Users set these via Zen Mod settings.
-     Each combo overrides top/bottom and left/right.
-  ──────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════
+   POSITION PREFERENCES — via -moz-pref() media queries
+   ════════════════════════════════════════════════════════════ */
 
-  /* Position: bottom */
-  &:has(#mbt-prefs[mbt-position-v='bottom']) {
+/* Vertical: bottom */
+@media (-moz-pref("mod.better-toast.position-v", "bottom")) {
+  #zen-toast-container {
     top:    unset            !important;
     bottom: var(--_offset-v) !important;
   }
+}
 
-  /* Position: left (override sidebar-aware default) */
-  &:has(#mbt-prefs[mbt-position-h='left']) {
+/* Horizontal: left */
+@media (-moz-pref("mod.better-toast.position-h", "left")) {
+  #zen-toast-container {
     right: unset            !important;
     left:  var(--_offset-h) !important;
   }
+  :root[zen-right-side='true'] #zen-toast-container {
+    right: unset            !important;
+    left:  var(--_offset-h) !important;
+  }
+}
 
-  /* Position: right (force right even on right-sidebar setups) */
-  &:has(#mbt-prefs[mbt-position-h='right']) {
+/* Horizontal: right */
+@media (-moz-pref("mod.better-toast.position-h", "right")) {
+  #zen-toast-container {
     left:  unset            !important;
     right: var(--_offset-h) !important;
   }
+  :root[zen-right-side='true'] #zen-toast-container {
+    left:  unset            !important;
+    right: var(--_offset-h) !important;
+  }
+}
 
-  /* Position: center */
-  &:has(#mbt-prefs[mbt-position-h='center']) {
-    left:      50%            !important;
-    right:     unset          !important;
+/* Horizontal: center */
+@media (-moz-pref("mod.better-toast.position-h", "center")) {
+  #zen-toast-container {
+    left:      50%              !important;
+    right:     unset            !important;
+    transform: translateX(-50%) !important;
+  }
+  :root[zen-right-side='true'] #zen-toast-container {
+    left:      50%              !important;
+    right:     unset            !important;
     transform: translateX(-50%) !important;
   }
 }
@@ -123,11 +143,11 @@
   max-width:     var(--mbt-max-width) !important;
 
   /* Glass */
-  background:    var(--mbt-bg)     !important;
-  border:        1px solid var(--mbt-border) !important;
+  background:              var(--mbt-bg)     !important;
+  border:                  1px solid var(--mbt-border) !important;
   backdrop-filter:         blur(var(--mbt-blur)) saturate(1.6) !important;
   -webkit-backdrop-filter: blur(var(--mbt-blur)) saturate(1.6) !important;
-  box-shadow:    var(--mbt-shadow) !important;
+  box-shadow:              var(--mbt-shadow) !important;
 
   /* Typography */
   color:          var(--mbt-text)           !important;
@@ -136,19 +156,19 @@
   letter-spacing: var(--mbt-letter-spacing) !important;
 
   /* Transition */
-  transition: background var(--mbt-transition),
+  transition: background   var(--mbt-transition),
               border-color var(--mbt-transition),
-              color var(--mbt-transition),
-              box-shadow var(--mbt-transition) !important;
+              color        var(--mbt-transition),
+              box-shadow   var(--mbt-transition) !important;
 
   /* Description text */
   & .description {
-    font-size:   var(--mbt-desc-size) !important;
-    opacity:     0.75                 !important;
-    margin-top:  2px                  !important;
+    font-size:  var(--mbt-desc-size) !important;
+    opacity:    0.75                 !important;
+    margin-top: 2px                  !important;
   }
 
-  /* ── Hover: accent highlight ── */
+  /* Hover: accent highlight */
   &:hover {
     background:   var(--zen-primary-color) !important;
     color:        var(--button-primary-color, #fff) !important;
