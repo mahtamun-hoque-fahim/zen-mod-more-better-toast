@@ -19,7 +19,6 @@
   --mbt-desc-size:      10px;
   --mbt-font-weight:    500;
   --mbt-max-width:      320px;
-  --mbt-min-offset:     12px;    /* fallback when element-separation = 0 */
   --mbt-transition:     0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --mbt-letter-spacing: 0.01em;
 
@@ -58,15 +57,8 @@
    Default: top + auto (sidebar-aware)
    ════════════════════════════════════════════════════════════ */
 #zen-toast-container {
-  /* Safe offset: max(preference-driven offset, minimum fallback) */
-  --_offset-v: max(
-    calc(var(--zen-element-separation, 8px) * 4),
-    var(--mbt-min-offset)
-  );
-  --_offset-h: max(
-    calc(var(--zen-element-separation, 8px) * 2),
-    var(--mbt-min-offset)
-  );
+  --_offset-v: 10vh;
+  --_offset-h: 10vw;
 
   /* Sit above panels, toolbars, sidebars — so blur has real UI to blur */
   z-index: 2147483647 !important;
