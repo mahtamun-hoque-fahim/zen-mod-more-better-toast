@@ -1,61 +1,60 @@
-# Better Toast — Zen Browser Mod
+# Better Toast
 
-A polished, frosted-glass pill toast notification for [Zen Browser](https://zen-browser.app/).
+Frosted-glass pill toast notifications for [Zen Browser](https://zen-browser.app/).
 
-![Better Toast preview](image.png)
+## What it does
 
-## Features
+Replaces the default Zen toast with a pill-shaped frosted glass notification that:
 
-- **Frosted glass** — `backdrop-filter: blur` with saturation boost, matching Zen's native aesthetic
-- **Auto dark / light** — white-tinted glass on dark backgrounds, dark-tinted glass on light backgrounds, driven by `prefers-color-scheme`
-- **4-way position control** — choose top or bottom (vertical) and left, center, right, or auto (horizontal) from Zen's mod settings panel
-- **Safe minimum offset** — no longer clips to the screen edge when `zen.theme.content-element-separation = 0`
-- **Sidebar-aware default** — auto mode places the toast on the opposite side from your sidebar
-- **Accent hover** — toast highlights in your Zen accent color on hover with a matching glow
+- Blurs whatever is behind it (`backdrop-filter: blur(12px) saturate(1.6)`)
+- Sits at **10vw / 10vh** from the screen edge — never hugging corners
+- Floats above everything (`z-index: 2147483647`, `position: fixed`)
+- Adapts to dark and light mode automatically
+- Highlights in your Zen accent color on hover
 
-## Install from Zen Mods Store
+## Position settings
 
-Search **"Better Toast"** in Zen Browser → Settings → Mods → Browse.
-
-## Manual Install
-
-1. Open Zen Browser → Settings → Mods
-2. Click **Add from file** (or drag & drop)
-3. Select the folder containing `chrome.css` and `metadata.json`
-4. Enable the mod
-
-## Settings
+Controlled from Zen Browser → Settings → Mods → Better Toast:
 
 | Setting | Options | Default |
 |---|---|---|
-| Vertical Position | Top / Bottom | Top |
-| Horizontal Position | Auto / Left / Center / Right | Auto |
+| Vertical | Top / Bottom | Top |
+| Horizontal | Auto / Left / Center / Right | Auto |
 
-**Auto** horizontal mode is sidebar-aware: it places the toast on the right when your sidebar is on the left, and on the left when your sidebar is on the right.
+**Auto** is sidebar-aware — places the toast on the opposite side from your sidebar.
 
-## Customisation
+## Install
 
-All visual variables are at the top of `chrome.css`:
+**From the store:** Settings → Mods → Browse → search "More Better Toast"
+
+**Manually:**
+1. Settings → Mods → Add from file
+2. Select the folder containing `chrome.css` and `metadata.json`
+3. Enable the mod
+
+## Customise
+
+Edit the variables at the top of `chrome.css`:
 
 ```css
---mbt-blur:         12px;    /* backdrop blur amount */
---mbt-radius:       999px;   /* pill shape — lower for rounded rect */
+--mbt-blur:         12px;    /* blur intensity */
+--mbt-radius:       999px;   /* lower = rounded rect instead of pill */
 --mbt-padding:      8px 16px;
 --mbt-font-size:    12px;
---mbt-desc-size:    10px;
---mbt-font-weight:  500;
 --mbt-max-width:    320px;
---mbt-min-offset:   12px;    /* minimum edge gap when separation = 0 */
 ```
 
-## How preferences work
+## Files
 
-Position preferences use Firefox's `-moz-pref()` media query API:
+| File | Purpose |
+|---|---|
+| `chrome.css` | All styles |
+| `metadata.json` | Mod metadata + preference definitions |
+| `preferences.json` | Store preference schema |
 
-```css
-@media (-moz-pref("mod.better-toast.position-v", "bottom")) { … }
-@media (-moz-pref("mod.better-toast.position-h", "center")) { … }
-```
+## Troubleshooting
+
+If blur doesn't show: open `about:config` and set `layout.css.backdrop-filter.force-enabled` to `true`.
 
 ## License
 
